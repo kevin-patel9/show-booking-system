@@ -9,6 +9,12 @@ Node.js + Express + PostgreSQL. Sells assigned seats without ever double-selling
 API runs at http://localhost:8080. Tables are created automatically.
 Settings (env vars): `DATABASE_URL`, `ADMIN_TOKEN` (default `dev-admin`), `PORT`, `DB_POOL_SIZE`.
 
+After Container is build
+
+    docker start ticket-api ticket-postgres
+
+    docker stop ticket-api ticket-postgres
+
 ## Auth
 
 Send `Authorization: Bearer <token>`.
