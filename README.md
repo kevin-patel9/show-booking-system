@@ -21,8 +21,8 @@ Send `Authorization: Bearer <token>`.
 - `ADMIN_TOKEN` can create shows.
 - Any other token is a user. The token is the user id.
 
-Important
-Bearer dev-admin
+Admin Token: `Bearer dev-admin`
+User Token: `Bearer user1`
 
 ## Endpoints
 
