@@ -6,7 +6,7 @@ Node.js + Express + PostgreSQL. Sells assigned seats without ever double-selling
 
     docker compose up --build
 
-API runs at http://localhost:3000. Tables are created automatically.
+API runs at http://localhost:8080. Tables are created automatically.
 Settings (env vars): `DATABASE_URL`, `ADMIN_TOKEN` (default `dev-admin`), `PORT`, `DB_POOL_SIZE`.
 
 ## Auth
@@ -14,6 +14,9 @@ Settings (env vars): `DATABASE_URL`, `ADMIN_TOKEN` (default `dev-admin`), `PORT`
 Send `Authorization: Bearer <token>`.
 - `ADMIN_TOKEN` can create shows.
 - Any other token is a user. The token is the user id.
+
+Important
+Bearer dev-admin
 
 ## Endpoints
 
@@ -39,3 +42,14 @@ Reserve body: `{ "seats": ["A12"], "idempotency_key": "abc" }` (or an `Idempoten
 ## Test
 
     npm run burst
+
+
+# Using AI Details (Claude and Chat-GPT)
+
+1. File and Function
+    a. Migration file from Claude
+    b. Error handling function like invalid path, db connection setup from Claude
+    c. Burst File for double booking handling
+3. Deployment
+    a. Deployment in Docker with setup YML file
+4. The main function of transaction for booking system while booking of seats 

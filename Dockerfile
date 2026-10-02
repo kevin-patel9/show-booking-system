@@ -6,6 +6,6 @@ COPY migrations ./migrations
 COPY src ./src
 COPY scripts ./scripts
 ENV NODE_ENV=production
-EXPOSE 3000
+EXPOSE 8080
 USER node
 CMD ["node", "src/server.js"]
