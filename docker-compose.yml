@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: ticket-postgres
+
+    environment:
+      POSTGRES_DB: tickets
+      POSTGRES_USER: tickets
+      POSTGRES_PASSWORD: tickets
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U tickets -d tickets"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+
+    container_name: ticket-api
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+
+      DATABASE_URL: postgres://tickets:tickets@postgres:5432/tickets
+      ADMIN_TOKEN: dev-admin
+      DB_POOL_SIZE: 50
+
+    ports:
+      - "8080:8080"
+
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
