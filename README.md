@@ -53,3 +53,7 @@ Reserve body: `{ "seats": ["A12"], "idempotency_key": "abc" }` (or an `Idempoten
 3. Deployment
     a. Deployment in Docker with setup YML file
 4. The main function of transaction for booking system while booking of seats 
+5. Create metric from Calude AI for system
+    a. During stampede
+    b. DB health
+    c. connected health
