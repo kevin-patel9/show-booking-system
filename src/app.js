@@ -4,8 +4,10 @@ const { HttpError } = require("./errors");
 const { requireUser, requireAdmin } = require("./auth");
 const shows = require("./shows");
 const reservations = require("./reservations");
+const metrics = require("./metrics");
 
 const app = express();
+app.use(metrics.httpMetrics); // before the body parser, so even a request with broken JSON is counted
 app.use(express.json({ limit: "2mb" }));
 
 // Health check
@@ -15,6 +17,16 @@ app.get("/healthz", async (req, res) => {
     res.status(200).send({ status: "ok" });
   } catch (err) {
     res.status(503).send({ status: "database_unavailable" });
+  }
+});
+
+// Prometheus metrics
+app.get("/metrics", async (req, res, next) => {
+  try {
+    res.set("Content-Type", metrics.registry.contentType);
+    res.send(await metrics.registry.metrics());
+  } catch (err) {
+    next(err);
   }
 });
 
@@ -49,8 +61,13 @@ app.post("/shows/:showId/reserve", requireUser, async (req, res, next) => {
       idempotencyKey: req.get("Idempotency-Key") || body.idempotency_key,
     });
 
+    // Counted before the response is sent, so a client that reads /metrics after it has its answer sees the new number.
+    if (result.replayed) metrics.reservationReplayed();
+    else metrics.reservationConfirmed();
+
     res.status(201).json(result.reservation);
   } catch (err) {
+    metrics.reservationFailed(err);
     next(err);
   }
 });

@@ -2,13 +2,23 @@ const fs = require("fs");
 const path = require("path");
 const { Pool } = require("pg");
 
+const connectionString = process.env.DATABASE_URL;
+
 const pool = new Pool({
-  connectionString:
-    process.env.DATABASE_URL || "postgres://kevinpatel:password@localhost:5432/tickets",
+  connectionString,
   max: Number(process.env.DB_POOL_SIZE || 50),
   connectionTimeoutMillis: 15000,
   options: "-c lock_timeout=10000 -c statement_timeout=30000",
 });
+
+// /metrics gets its own one-connection pool. During a stampede every connection in the big pool
+const observabilityPool = new Pool({
+  connectionString,
+  max: 1,
+  connectionTimeoutMillis: 2000,
+  options: "-c statement_timeout=5000",
+});
+observabilityPool.on("error", () => {});
 
 // Run a function inside a transaction. Commits on success, rolls back on error.
 // Retries if Postgres reports a deadlock.
@@ -43,4 +53,4 @@ async function setupDatabase() {
   await pool.query(sql);
 }
 
-module.exports = { pool, withTransaction, setupDatabase };
+module.exports = { pool, observabilityPool, withTransaction, setupDatabase };
